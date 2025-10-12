@@ -15,5 +15,30 @@ Danny has shared with you 3 key datasets for this case study:
 ![menu]()
 ![sales]()
 
-Below is the ERD that shows the relationship between the tables
-![ERD](.png)
+
+### Below is the ERD that shows the relationship between the tables
+![ERD](https://github.com/tjstat214/danny_ma_week1_sql_challenge/blob/main/ERD_1_for_danny_ma_SQLchallenge.png)
+
+#### I will be using SQL queries to provide answers to danny questions.
+## Question 1: What is the total amount each customer spent at the restaurant?
+<pre>SELECT customer_id, SUM(price) AS total_amount
+FROM sales S 
+JOIN menu M
+ON S.product_id = M.product_id 
+GROUP BY 1;</pre>
+I joined the menu and sales tables to get customer_id and price, then summed the prices as total_amount and grouped the results by each customer_id.
+
+![answer1](results_folder/result1.png)
+
+Customers A, B, and C spent $76, $74, and $36 respectively
+
+## Question 2: How many days has each customer visited the restaurant?
+
+
+
+
+
+
+
+
+
