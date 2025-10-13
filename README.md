@@ -33,8 +33,16 @@ I joined the menu and sales tables to get customer_id and price, then summed the
 Customers A, B, and C spent $76, $74, and $36 respectively
 
 ## Question 2: How many days has each customer visited the restaurant?
+<pre> 
+SELECT customer_id, COUNT( DISTINCT order_date ) AS days_count
+FROM sales 
+GROUP BY 1;</pre>
+I selected customer_id and counted distinct order_date to capture visits by day (ignoring visit times), then grouped the visit count by each customer_id
+![answer2](results_folder/result2.png)
 
+Customer A, B, and C visited the restaurant in 4,6, and 2 days respectively
 
+## Question 3:
 
 
 
