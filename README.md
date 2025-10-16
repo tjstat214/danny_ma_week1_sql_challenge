@@ -2,7 +2,7 @@
 ![Case study 1](Danny_MA_SQL_challenge_1.png)
 
 To practice my SQL skill, I took Danny MA 8 weeks SQL challenge, case study number 1.
-This project gives me the ability to apply my SQL knowlege to provide answers to business questions provided,
+This project gives me the ability to apply my SQL knowlege to provide answers to business questions,
 and also derived insight that can help make a better data driven decision.
 
 ## Introduction
@@ -119,8 +119,74 @@ while ramen, curry and sushi have the same number of purchase for customer C.*
 
 ## Question 6: Which item was purchased first by the customer after they became a member?
 <pre>
-  
+WITH cte AS (
+SELECT s.customer_id, product_name, join_date, order_date,
+ ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date) AS row_no
+FROM sales s JOIN menu m USING ( product_id ) LEFT JOIN members me ON s.customer_id = me.customer_id
+WHERE order_date >= join_date ) 
+SELECT customer_id, product_name AS first_product
+FROM cte 
+WHERE row_no = 1 ;
 </pre>
+At first, I created a table joining the sale, menu and member together, and add a new column( row_no) using window function
+to numbering the customer orders by order_date. Then I selected out customer first product by filtering out customer first order.
+
+![answer6](results_folder/result6.png)
+
+*After being a member, curry and sushi was the first item purchased by customer A and customer B respectively. Customer C is not among member, that's why we
+  dont have his item among the list obtained.*
+
+## Question 7: Which item was purchased just before the customer became a member?
+<pre>
+SELECT S.customer_id, product_name, join_date, order_date 
+FROM sales S
+      JOIN menu M
+      USING ( product_id ) 
+      LEFT JOIN members me 
+      ON s.customer_id = me.customer_id 
+WHERE order_date < join_date -- to filter customer order before becoming member 
+ORDER BY 1;
+</pre>
+
+To show product purchased after customer becoming a member, I joined the 3 tables together and
+filter customer order before becoming member  using *WHERE order_date < join_date*
+
+![answer7](results_folder/result7.png)
+
+*sushi and curry are the items purchased by cutomer A and B before they became member. Note that customer C is not a member.*
+
+## Question 8:  What is the total items and amount spent for each member before they became a member?
+<pre>
+      SELECT S.customer_id, COUNT(*) AS total_items, SUM(price) AS total_amount
+FROM sales S
+      JOIN menu M
+      USING ( product_id )
+      LEFT JOIN members MEM 
+      ON s.customer_id = MEM.customer_id 
+WHERE order_date < join_date
+GROUP BY 1 
+ORDER BY 1;
+</pre>
+
+Breaking the question, I need to show each customers, their total items, and total amount spent before becoming member.
+To do this, I joined the 3 tables together then selected customers, and creating their total items and total amount,filtering only
+where the customer order before becaming member.
+
+![answer8](results_folder/result8.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
