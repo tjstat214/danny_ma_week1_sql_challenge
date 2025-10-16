@@ -120,9 +120,13 @@ while ramen, curry and sushi have the same number of purchase for customer C.*
 ## Question 6: Which item was purchased first by the customer after they became a member?
 <pre>
 WITH cte AS (
-SELECT s.customer_id, product_name, join_date, order_date,
- ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date) AS row_no
-FROM sales s JOIN menu m USING ( product_id ) LEFT JOIN members me ON s.customer_id = me.customer_id
+SELECT S.customer_id, product_name, join_date, order_date,
+       ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date) AS row_no
+FROM sales S 
+      JOIN menu M
+      USING ( product_id )
+      LEFT JOIN members ME 
+      ON S.customer_id = ME.customer_id
 WHERE order_date >= join_date ) 
 SELECT customer_id, product_name AS first_product
 FROM cte 
@@ -173,6 +177,56 @@ To do this, I joined the 3 tables together then selected customers, and creating
 where the customer order before becaming member.
 
 ![answer8](results_folder/result8.png)
+
+*Before becoming member, Customer A bought a total of 2 items at total amount of 25, while customer B bought a total of 3 items
+at total amount of 40. Note: customer C is not a member.*
+
+## Question 9: If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+<pre>
+WITH cte AS (
+SELECT customer_id, product_name, price, 10*price AS points, 
+      CASE 
+            WHEN product_name = 'sushi' THEN 2*10*price 
+            ELSE 10*price 
+      END AS new_points
+FROM sales 
+      JOIN menu
+      USING ( product_id ) )
+SELECT customer_id, SUM(new_points) AS total_points
+FROM cte
+GROUP BY 1;
+</pre>
+
+At first, I created a new table by joining the sale and menu table together. This new table involves
+customer_id, product_name, price, and two additional columns. A new column named "points" which is equal
+to 10 multiply by price( because $1 equals 10points). Also another column named "new_points" using CASE statement.
+This was obtained by multiplying the points by 2 if the product_name is sushi and the points remain the same for others.
+To obtained total points for each customers, I used CTE(customers_point) for the table created and SUM the new_points( as total_points),
+then grouped it by each customer.
+
+![answer9](results_folder/result9.png)
+
+*Customer A, B, and C has 860, 940, and 360 points respectively.*
+
+## Question 10: In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+<pre>
+      
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
