@@ -10,10 +10,10 @@ Danny wants to use data to answer a few simple questions about his customers, es
 
 Danny has provided a sample of his overall customer data due to privacy issues - but he hopes that these examples are enough to write fully functioning SQL queries to help him answer his questions!
 
-Danny has shared with you 3 key datasets for this case study:
-![members](members.csv)
-![menu](menu.csv)
-![sales](sales.csv)
+Danny has provided 3 key datasets for this case study:
+![members](Members.csv)
+![menu](Menu.csv)
+![sales](Sales.csv)
 
 
 ### Below is the ERD that shows the relationship between the tables
@@ -22,11 +22,14 @@ Danny has shared with you 3 key datasets for this case study:
 #### I will be using SQL queries to provide answers to danny questions.
 
 ## Question 1: What is the total amount each customer spent at the restaurant?
-<pre>SELECT customer_id, SUM(price) AS total_amount
+<pre>
+SELECT customer_id, 
+	SUM(price) AS total_amount
 FROM sales S 
 JOIN menu M
 ON S.product_id = M.product_id 
-GROUP BY 1;</pre>
+GROUP BY 1;
+</pre>
 I joined the menu and sales tables to get customer_id and price, then summed the prices as total_amount and grouped the results by each customer_id.
 
 ![answer1](results_folder/result1.png)
@@ -35,9 +38,11 @@ I joined the menu and sales tables to get customer_id and price, then summed the
 
 ## Question 2: How many days has each customer visited the restaurant?
 <pre> 
-SELECT customer_id, COUNT( DISTINCT order_date ) AS days_count
+SELECT customer_id, 
+	COUNT( DISTINCT order_date ) AS days_count
 FROM sales 
-GROUP BY 1;</pre>
+GROUP BY 1;
+</pre>
 I selected customer_id and counted distinct order_date to capture visits by day (ignoring visit times), then grouped the visit count by each customer_id
 
 ![answer2](results_folder/result2.png)
@@ -47,12 +52,16 @@ I selected customer_id and counted distinct order_date to capture visits by day 
 ## Question 3:  What was the first item from the menu purchased by each customer?
 <pre> 
 WITH cte AS (
-SELECT customer_id, order_date , s.product_id, product_name,
-      ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date ) AS row_no
+SELECT customer_id, 
+	order_date , 
+	s.product_id, 
+	product_name,
+    ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date ) AS row_no
 FROM sales S
 JOIN menu M
 ON S.product_id = M.product_id)
-SELECT customer_id, product_name AS first_item_purchased
+SELECT customer_id, 
+	product_name AS first_item_purchased
 FROM cte
 WHERE row_no = 1 ;
 </pre>
@@ -66,7 +75,9 @@ I made the query result above as CTE and extract each customer_id with their fir
 
 ## Question 4: What is the most purchased item on the menu and how many times was it purchased by all customers?
 <pre>
-SELECT S.customer_id, M.product_name AS most_purchased_item, count(S.order_date) AS no_of_time_purchased
+SELECT S.customer_id, 
+	M.product_name AS most_purchased_item, 
+	count(S.order_date) AS no_of_time_purchased
 FROM sales as S
 JOIN menu as M
 ON S.product_id = M.product_id
@@ -98,7 +109,9 @@ from the CTE(product_no_of_purchase_table) results
 ## Question 5: Which item was the most popular for each customer?
 <pre>
 WITH cte AS (
-SELECT DISTINCT customer_id, product_name, COUNT(S.product_id) AS product_count
+SELECT DISTINCT customer_id,
+	product_name, 
+	COUNT(S.product_id) AS product_count
 FROM sales S
 JOIN menu M
 ON S.product_id = M.product_id 
@@ -120,8 +133,11 @@ while ramen, curry and sushi have the same number of purchase for customer C.*
 ## Question 6: Which item was purchased first by the customer after they became a member?
 <pre>
 WITH cte AS (
-SELECT S.customer_id, product_name, join_date, order_date,
-       ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date) AS row_no
+SELECT S.customer_id, 
+	product_name, 
+	join_date, 
+	order_date,
+    ROW_NUMBER () OVER ( PARTITION BY customer_id ORDER BY order_date) AS row_no
 FROM sales S 
       JOIN menu M
       USING ( product_id )
@@ -142,7 +158,10 @@ to numbering the customer orders by order_date. Then I selected out customer fir
 
 ## Question 7: Which item was purchased just before the customer became a member?
 <pre>
-SELECT S.customer_id, product_name, join_date, order_date 
+SELECT S.customer_id, 
+	product_name, 
+	join_date,
+	order_date 
 FROM sales S
       JOIN menu M
       USING ( product_id ) 
@@ -161,7 +180,9 @@ filter customer order before becoming member  using *WHERE order_date < join_dat
 
 ## Question 8:  What is the total items and amount spent for each member before they became a member?
 <pre>
-      SELECT S.customer_id, COUNT(*) AS total_items, SUM(price) AS total_amount
+SELECT S.customer_id,
+	COUNT(*) AS total_items,
+	SUM(price) AS total_amount
 FROM sales S
       JOIN menu M
       USING ( product_id )
@@ -184,15 +205,19 @@ at total amount of 40. Note: customer C is not a member.*
 ## Question 9: If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 <pre>
 WITH cte AS (
-SELECT customer_id, product_name, price, 10*price AS points, 
-      CASE 
-            WHEN product_name = 'sushi' THEN 2*10*price 
-            ELSE 10*price 
-      END AS new_points
+SELECT customer_id, 
+	product_name, 
+	price, 
+	10*price AS points, 
+    CASE 
+        WHEN product_name = 'sushi' THEN 2*10*price 
+        ELSE 10*price 
+    END AS new_points
 FROM sales 
       JOIN menu
       USING ( product_id ) )
-SELECT customer_id, SUM(new_points) AS total_points
+SELECT customer_id, 
+	SUM(new_points) AS total_points
 FROM cte
 GROUP BY 1;
 </pre>
