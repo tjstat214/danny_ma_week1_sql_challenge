@@ -11,9 +11,9 @@ Danny wants to use data to answer a few simple questions about his customers, es
 Danny has provided a sample of his overall customer data due to privacy issues - but he hopes that these examples are enough to write fully functioning SQL queries to help him answer his questions!
 
 Danny has shared with you 3 key datasets for this case study:
-![members]()
-![menu]()
-![sales]()
+![members](members.csv)
+![menu](menu.csv)
+![sales](sales.csv)
 
 
 ### Below is the ERD that shows the relationship between the tables
@@ -210,10 +210,38 @@ then grouped it by each customer.
 
 ## Question 10: In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 <pre>
-      
+WITH point_table AS(
+SELECT s.customer_id,
+      product_name,
+      join_date,
+      order_date,
+      price,  
+      join_date + INTERVAL 7 DAY AS first_week_after_customer_joins,
+	CASE
+	      WHEN order_date BETWEEN join_date AND join_date + INTERVAL 7 DAY THEN 2*10*price
+        ELSE price*10
+	END AS customer_point
+FROM sales s
+JOIN menu m 
+      USING ( product_id )
+JOIN members me 
+      ON s.customer_id = me.customer_id )
+SELECT customer_id,
+      SUM(customer_point) AS total_points
+FROM point_table
+WHERE month(order_date) = 1
+GROUP BY 1 ;
 </pre>
 
+After merging the sale, member and menu tables together, I created a column(first_week_after_customer_joins) by adding 7 days to the join date column to show date for a week after customer joined. Also to give the 2x point on all items, I created another column using CASE statement. This was done by assigning 2*10*price to the orders made 
+BETWEEN join_date AND the new created "first_week_after_customer_joins" and leaving the price if the condition was not met.
+Finally, to answer the question, I created a CTE(point_table) including customer_id, product_name, join_date, order_date, price, and the
+2 new columns(first_week_after_customer_joins and customer_point), then SUMming the customer_points by customer_id, This was done for
+orders only in the month of january (WHERE month(order_date) = 1)
 
+![answer10](results_folder/result10.png)
+
+*Customer A has 1270 points while customer B has 840 points*
 
 
 
