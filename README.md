@@ -11,8 +11,10 @@ Danny wants to use data to answer a few simple questions about his customers, es
 Danny has provided a sample of his overall customer data due to privacy issues - but he hopes that these examples are enough to write fully functioning SQL queries to help him answer his questions!
 
 Danny has provided 3 key datasets for this case study:
-[members](Members.csv)
+[members](https://github.com/tjstat214/danny_ma_week1_sql_challenge/blob/main/Datasets/Members.csv)
+
 [menu](Menu.csv)
+
 [sales](Sales.csv)
 
 
